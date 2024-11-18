@@ -71,4 +71,77 @@ module registerbeh(
      end
     end
 endmodule
+/*
+module reg4bit(
+input [3:0] D,   
+    input clk,        
+    input reset,      
+    input enable, 
+    output [3:0] Q,  
+    output [3:0] Qbar
+    );
+    always @(posedge clk , negedge reset)
+    begin
+        if (reset) begin
+            Q <= 4'b0000;
+            Qbar <= 4'b1111;
+        end 
+        else
+      begin
+    */
+
+
+
+
+//7sgements
+module top_module(
+    input wire CLK100MHZ,     // Clock signal
+    input wire CPU_RESETN,    // Active-low reset
+    input wire [15:0] SW,     // Switch inputs
+    input wire BTNC,          // Button press (clock signal)
+    output wire CA1, CB1, CC1, CD1, CE1, CF1, CG1, DP1,  // 7-segment outputs for register 1
+    output wire CA2, CB2, CC2, CD2, CE2, CF2, CG2, DP2,  // 7-segment outputs for register 2
+    output wire [7:0] AN      // Digit enable signals
+);
+
+    wire [7:0] Q1, Q2;   // Outputs from both registers
+    
+    // Instantiate the two registers
+    registerbeh reg1 (
+        .D(SW[7:0]),         // Data from switches
+        .clk(BTNC),          // Clock from button press
+        .reset(CPU_RESETN),  // Active-low reset
+        .Q(Q1),
+        .Qbar()              // Not used here
+    );
+
+    registerbeh reg2 (
+        .D(SW[7:0]),         // Data from switches
+        .clk(BTNC),          // Clock from button press
+        .reset(CPU_RESETN),  // Active-low reset
+        .Q(Q2),
+        .Qbar()              // Not used here
+    );
+
+    // Instantiate the 7-segment display for register 1
+    sev_seg_top display1 (
+        .CLK100MHZ(CLK100MHZ),
+        .CPU_RESETN(CPU_RESETN),
+        .CA(CA1), .CB(CB1), .CC(CC1), .CD(CD1), .CE(CE1), .CF(CF1), .CG(CG1), .DP(DP1),
+        .AN(AN),
+        .SW(Q1)  // Use the output of register 1 for the display
+    );
+
+    sev_seg_top display2 (
+        .CLK100MHZ(CLK100MHZ),
+        .CPU_RESETN(CPU_RESETN),
+        .CA(CA2), .CB(CB2), .CC(CC2), .CD(CD2), .CE(CE2), .CF(CF2), .CG(CG2), .DP(DP2),
+        .AN(AN),
+        .SW(Q2)  
+    );
+
+endmodule
+
+
+
 
